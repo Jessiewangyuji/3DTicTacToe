@@ -315,7 +315,7 @@ def minmax():
                     board[i1][j1][k1] = 'X' if count % 2 == 0 else 'O'
                 loc = str(i1) + str(j1) + str(k1)
                 currMax = -float("inf")
-                oppoMin = float("inf")
+                oppoMax = -float("inf")
                 for i2 in range(4):
                     for j2 in range(4):
                         for k2 in range(4):
@@ -330,17 +330,17 @@ def minmax():
 
 #print myVal, oppoVal
                             currMax = max(currMax, myVal)
-                            oppoMin = min(oppoMin, oppoVal)
+                            oppoMax = max(oppoMax, oppoVal)
                             board[i2][j2][k2] = '_'
                 
                 max_dict[loc] = currMax
-                min_dict[loc] = oppoMin
+                min_dict[loc] = oppoMax
                 board[i1][j1][k1] = '_'
 
     minVal = float("inf")
 
-#print min_dict
-#print max_dict
+    print min_dict
+    print max_dict
     
     for loc in min_dict:
         if minVal <= min_dict[loc]:
@@ -363,6 +363,10 @@ def minmax():
 count = 0
 board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
 #board[0][0][0] = 'X'
+#board[2][2][2] = 'O'
+#board[0][0][1] = 'X'
+#board[0][0][2] = 'O'
+#board[
 #board[0][0][1] = 'X'
 #board[0][0][2] = 'X'
 #board[2][1][2] = 'O'
