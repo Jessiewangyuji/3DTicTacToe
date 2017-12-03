@@ -98,177 +98,281 @@ def getInput():
             board[level][x][y] = 'X' if count % 2 == 0 else 'O'
             break
     count += 1
-    displayBoard()
-
-def heuristic(level1, x1, y1, level2, x2, y2):
-    if board[level1][x1][y1] != '_' or board[level2][x2][y2] != '_':
-        return -float("inf")
-    myMove = 'X' if count % 2 == 0 else 'O'
-    opponentMove = 'O' if count % 2 == 0 else 'X'
-    board[level1][x1][y1] = 'X' if count % 2 == 0 else 'O'
-    board[level2][x2][y2] = 'O' if count % 2 == 0 else 'X'
 #displayBoard()
+
+def heuristic(player):
+    global board
+    myMove = 'X' if player % 2 == 0 else 'O'
+    opponentMove = 'O' if player % 2 == 0 else 'X'
+    #board[level1][x1][y1] = 'X' if count % 2 == 0 else 'O'
+    #board[level2][x2][y2] = 'O' if count % 2 == 0 else 'X'
+    #displayBoard()
     eval = 0
     #horizontal
     myCount = 0
     opponentCount = 0
     for i in range(4):
-        if board[level1][x1][i] == myMove:
-            myCount += 1
-        elif board[level1][x1][i] == opponentMove:
-            opponentCount += 1
-    eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-    myCount = 0
-    opponentCount = 0
-    for i in range(4):
-        if board[level1][i][y1] == myMove:
-            myCount += 1
-        elif board[level1][i][y1] == opponentMove:
-            opponentCount += 1
-    eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-    myCount = 0
-    opponentCount = 0
-    if (x1 - y1) == 0:
-        for i in range(4):
-            if board[level1][i][i] == myMove:
-                myCount += 1
-            elif board[level1][i][i] == opponentCount:
+        levelBoard = board[i]
+        #horizontal
+        for j in range(4):
+            myPrev = 0
+            myCount = 0
+            opponentCount = 0
+            for k in range(4):
+                if levelBoard[j][k] == opponentMove:
+                    opponentCount += 1
+                    break
+                elif levelBoard[j][k] == '_':
+                    myPrev = 0
+                else:
+                    myPrev += 1 if k == 0 or levelBoard[j][k - 1] == levelBoard[j][k] else 1
+                    myCount = max(myPrev, myCount)
+            eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+        #vertical
+        for k in range(4):
+            myPrev = 0
+            myCount = 0
+            opponentCount = 0
+            for j in range(4):
+                if levelBoard[j][k] == opponentMove:
+                    opponentCount += 1
+                    break
+                elif levelBoard[j][k] == '_':
+                    myPrev = 0
+                else:
+                    myPrev += 1 if j == 0 or levelBoard[j - 1][k] == levelBoard[j][k] else 1
+                    myCount = max(myPrev, myCount)
+            eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+            
+        myPrev = 0
+        myCount = 0
+        opponentCount = 0
+        for j in range(4):
+            if levelBoard[j][j] == opponentMove:
                 opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-    myCount = 0
-    opponentCount = 0
-    if x1 + y1 == 3:
-        for i in range(4):
-            if board[level1][i][3 - i] == myMove:
-                myCount += 1
-            elif board[level1][i][3 - i] == opponentCount:
+                break
+            elif levelBoard[j][j] == '_':
+                myPrev = 0
+            else:
+                myPrev += 1 if j == 0 or levelBoard[j - 1][j - 1] == levelBoard[j][j] else 1
+                myCount = max(myPrev, myCount)
+        eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+
+        myPrev = 0
+        myCount = 0
+        opponentCount = 0
+        for j in range(4):
+            if levelBoard[j][3 - j] == opponentMove:
                 opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-
-    board[level1][x1][y1] = '_'
-    board[level2][x2][y2] = '_'
-
+                break
+            elif levelBoard[j][3 - j] == '_':
+                myPrev = 0
+            else:
+                myPrev += 1 if j == 0 or levelBoard[j - 1][3 - (j - 1)] == levelBoard[j][3 - j] else 1
+                myCount = max(myPrev, myCount)
+        eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+            
     #vertical
-    myCount = 0
-    opponentCount = 0
-    for i in range(4):
-        if board[i][x1][y1] == myMove:
-            myCount += 1
-        elif board[i][x1][y1] == opponentMove:
-            opponentCount += 1
-    eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-    myCount = 0
-    opponentCount = 0
-    if (level1 - x1) == 0:
+    for j in range(4):
+        for k in range(4):
+            myCount = 0
+            opponentCount = 0
+            myPrev = 0
+            for i in range(4):
+                if board[i][j][k] == opponentMove:
+                    opponentCount += 1
+                    break
+                elif board[i][j][k] == '_':
+                    myPrev = 0
+                else:
+                    myPrev += 1 if i == 0 or board[i - 1][j][k] == board[i][j][k] else 1
+                    myCount = max(myPrev, myCount)
+            eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+
+    for j in range(4):
+        myCount = 0
+        opponentCount = 0
+        myPrev = 0
         for i in range(4):
-            if board[i][i][y1] == myMove:
-                myCount += 1
-            elif board[i][i][y1] == opponentMove:
+            if board[i][j][i] == opponentMove:
                 opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-    myCount = 0
-    opponentCount = 0
-    if (level1 + x1) == 3:
+                break
+            elif board[i][j][i] == '_':
+                myPrev = 0
+            else:
+                myPrev += 1 if i == 0 or board[i - 1][j][i - 1] == board[i][j][i] else 1
+                myCount = max(myPrev, myCount)
+        eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+
+        myCount = 0
+        opponentCount = 0
+        myPrev = 0
         for i in range(4):
-            if board[i][3 - i][y1] == myMove:
-                myCount += 1
-            elif board[i][3 - i][y1] == opponentMove:
+            if board[i][j][3 - i] == opponentMove:
                 opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-    myCount = 0
-    opponentCount = 0
-    if (level1 - y1) == 0:
+                break
+            elif board[i][j][3 - i] == '_':
+                myPrev = 0
+            else:
+                myPrev += 1 if i == 0 or board[i - 1][j][3 - (i - 1)] == board[i][j][3 - i] else 1
+                myCount = max(myPrev, myCount)
+        eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+        myCount = 0
+        opponentCount = 0
+        myPrev = 0
         for i in range(4):
-            if board[i][x1][i] == myMove:
-                myCount += 1
-            elif board[i][x1][i] == opponentMove:
+            if board[i][i][j] == opponentMove:
                 opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
-    myCount = 0
-    opponentCount = 0
-    if (level1 + y1) == 3:
+                break
+            elif board[i][i][j] == '_':
+                myPrev = 0
+            else:
+                myPrev += 1 if i == 0 or board[i - 1][i - 1][j] == board[i][i][j] else 1
+                myCount = max(myPrev, myCount)
+        eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+        myCount = 0
+        opponentCount = 0
+        myPrev = 0
         for i in range(4):
-            if board[i][x1][3 - i] == myMove:
-                myCount += 1
-            elif board[i][x1][3 - i] == opponentMove:
+            if board[i][3 - i][j] == opponentMove:
                 opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
+                break
+            elif board[i][3 - i][j] == '_':
+                myPrev = 0
+            else:
+                myPrev += 1 if i == 0 or board[i - 1][3 - (i - 1)][j] == board[i][3 - i][j] else 1
+                myCount = max(myPrev, myCount)
+        eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
     #diagonal
     myCount = 0
     opponentCount = 0
-    if level1 == x1 and x1 == y1:
-        for i in range(4):
-            if board[i][i][i] == myMove:
-                myCount += 1
-            elif board[i][i][i] == opponentMove:
-                opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
+    myPrev = 0
+    for i in range(4):
+        if board[i][i][i] == opponentMove:
+            opponentCount += 1
+            break
+        elif board[i][i][i] == '_':
+            myPrev = 0
+        else:
+            myPrev += 1 if i == 0 or board[i - 1][i - 1][i - 1] == board[i][i][i] else 1
+            myCount = max(myPrev, myCount)
+    eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+
     myCount = 0
     opponentCount = 0
-    if (level1 == x1) and (y1 == (3 - level1)):
-        for i in range(4):
-            if board[i][i][3 - i] == myMove:
-                myCount += 1
-            elif board[i][i][3 - i] == opponentMove:
-                opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
+    myPrev = 0
+    for i in range(4):
+        if board[i][i][3 - i] == opponentMove:
+            opponentCount += 1
+            break
+        elif board[i][i][3 - i] == '_':
+            myPrev = 0
+        else:
+            myPrev += 1 if i == 0 or board[i - 1][i - 1][3 - (i - 1)] == board[i][i][3 - i] else 1
+            myCount = max(myPrev, myCount)
+    eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+
     myCount = 0
     opponentCount = 0
-    if (level1 == y1) and (x1 == (3 - level1)):
-        for i in range(4):
-            if board[i][3 - i][i] == myMove:
-                myCount += 1
-            elif board[i][3 - i][i] == opponentMove:
-                opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
+    myPrev = 0
+    for i in range(4):
+        if board[i][3 - i][i] == opponentMove:
+            opponentCount += 1
+            break
+        elif board[i][3 - i][i] == '_':
+            myPrev = 0
+        else:
+            myPrev += 1 if i == 0 or board[i - 1][3 - (i - 1)][i - 1] == board[i][3 - i][i] else 1
+            myCount = max(myPrev, myCount)
+    eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+
     myCount = 0
     opponentCount = 0
-    if (x1 == y1) and (x1 == (3 - level1)):
-        for i in range(4):
-            if board[3 - i][i][i] == myMove:
-                myCount += 1
-            elif board[3 - i][i][i] == opponentMove:
-                opponentCount += 1
-        eval += 0 if opponentCount > 0 else pow(76, myCount - 1)
+    myPrev = 0
+    for i in range(4):
+        if board[3 - i][i][i] == opponentMove:
+            opponentCount += 1
+            break
+        elif board[3 - i][i][i] == '_':
+            myPrev = 0
+        else:
+            myPrev += 1 if i == 0 or board[3 - (i - 1)][i - 1][i - 1] == board[3 - i][i][i] else 1
+            myCount = max(myPrev, myCount)
+    eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
+
     return eval
 
 def minmax():
-    dict = {}
+    max_dict = {}
+    min_dict = {}
     for i1 in range(4):
         for j1 in range(4):
             for k1 in range(4):
+                if board[i1][j1][k1] != '_':
+                    continue
+                else:
+                    board[i1][j1][k1] = 'X' if count % 2 == 0 else 'O'
                 loc = str(i1) + str(j1) + str(k1)
+                currMax = -float("inf")
+                oppoMin = float("inf")
                 for i2 in range(4):
                     for j2 in range(4):
                         for k2 in range(4):
-                            val = heuristic(i1, j1, k1, i2, j2, k2)
-                            print(val, loc in dict)
-                            if val == -float("inf"):
+                            myVal = heuristic(count)
+
+                            if board[i2][j2][k2] != '_':
                                 continue
-                            if loc in dict:
-                                dict[loc] = min(val, dict[loc])
                             else:
-                                dict[loc] = val
-                            #dict[loc] = val if loc not in dict else min(val, dict[loc])
-    currMax = -float("inf")
-    currLoc = ""
-    print(dict)
-    for loc in dict:
-        if currMax > dict[loc]:
+                                board[i2][j2][k2] = 'O' if count % 2 == 0 else 'X'
+
+                            oppoVal = heuristic(count + 1)
+
+#print myVal, oppoVal
+                            currMax = max(currMax, myVal)
+                            oppoMin = min(oppoMin, oppoVal)
+                            board[i2][j2][k2] = '_'
+                
+                max_dict[loc] = currMax
+                min_dict[loc] = oppoMin
+                board[i1][j1][k1] = '_'
+
+    minVal = float("inf")
+
+#print min_dict
+#print max_dict
+    
+    for loc in min_dict:
+        if minVal <= min_dict[loc]:
             continue
         else:
-            currMax = dict[loc]
-            currLoc = loc
-    return currMax, loc
+            minVal = min_dict[loc]
+#print minVal
+
+    maxLoc = ""
+    maxVal = -float("inf")
+    for loc in min_dict:
+        if min_dict[loc] == minVal:
+            if maxVal >= max_dict[loc]:
+                continue
+            else:
+                maxVal = max_dict[loc]
+                maxLoc = loc
+    return maxVal, maxLoc
 
 count = 0
 board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
 #board[0][0][0] = 'X'
 #board[0][0][1] = 'X'
-#board[0][2][2] = 'O'
+#board[0][0][2] = 'X'
+#board[2][1][2] = 'O'
+#board[2][3][0] = 'O'
+#board[0][0][3] = 'O'
+
 #print(minmax())
-#heuristic(0, 0, 2, 1, 1, 1)
+#print(heuristic(1))
+#print(heuristic(2, 2, 2, 0, 0, 2, 0))
+
 while True:
     displayBoard()
     getInput()
