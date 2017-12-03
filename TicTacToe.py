@@ -378,6 +378,9 @@ while True:
     getInput()
     if checkWin():
         break
+
     currMax, loc = minmax()
     board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
+    if checkWin():
+        break
     count += 1
