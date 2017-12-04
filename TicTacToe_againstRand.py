@@ -391,25 +391,77 @@ def minmax():
                 maxLoc = loc
     return maxVal, maxLoc or loc
 
+def randomPlayer():
+    global available
+    if len(available) == 0:
+        print "DRAW"
+        return
+
+    randomLoc = random.randint(0, len(available) - 1)
+    global board
+    global count
+    board[int(available[randomLoc][0])][int(available[randomLoc][1])][int(available[randomLoc][2])] = 'X' if count % 2 == 0 else 'O'
+    del available[randomLoc]
+    count += 1
+
 count = 0
 board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
+#board[0][0][0] = 'X'
+#board[2][2][2] = 'O'
+#board[0][0][1] = 'X'
+#board[0][0][2] = 'O'
+#board[
+#board[0][0][1] = 'X'
+#board[0][0][2] = 'X'
+#board[2][1][2] = 'O'
+#board[2][3][0] = 'O'
+#board[0][0][3] = 'O'
+
+#print(minmax())
+#print(heuristic(1))
+#print(heuristic(2, 2, 2, 0, 0, 2, 0))
+
+available = []
+for i in range(4):
+    for j in range(4):
+        for k in range(4):
+            available.append(str(i) + str(j) + str(k))
 
 numHand = 0
-while True:
-    if numHand == 32:
-        print "DRAW!"
-        break
-    displayBoard()
-    getInput()
-    numHand += 1
-    if checkWin():
-        displayBoard()
-        break
+numWin = 0
+numLose = 0
+numDraw = 0
+numStep = 0
+for num in range(1000):
+    numHand = 0
+    available = []
+    for i in range(4):
+        for j in range(4):
+            for k in range(4):
+                available.append(str(i) + str(j) + str(k))
+    count = 0
+    board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
 
-    currMax, loc = minmax()
-    board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
+    while True:
+        if len(available) == 0:
+            numDraw += 1
+            break
+        #displayBoard()
+        #getInput()
+        randomPlayer()
+        numHand += 1
+        if checkWin():
+            numLose += 1
+            break
 
-    count += 1
-    if checkWin():
-        displayBoard()
-        break
+        currMax, loc = minmax()
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
+        del available[available.index(loc)]
+        count += 1
+        if checkWin():
+            numWin += 1
+            numStep += numHand
+            #displayBoard()
+            break
+
+print "Probabiliy of wining against random is %f with average winning steps of %f" % ((numWin / 100), (numStep / (float)(numWin)))
