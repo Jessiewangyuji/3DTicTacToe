@@ -1,3 +1,5 @@
+import random
+
 def displayBoard():
     global board
     for i in range(4):
@@ -9,23 +11,24 @@ def displayBoard():
             print
 
 def checkWin():
+    global numHand
     if checkHorizontal():
         if count % 2 == 1:
-            print 'X has won the game'
+            print 'X has won the game in %d steps' % numHand
         else:
-            print 'O has won the game'
+            print 'O has won the game in %d steps' % numHand
         return True
     elif checkVertical():
         if count % 2 == 1:
-            print 'X has won the game'
+            print 'X has won the game in %d steps' % numHand
         else:
-            print 'O has won the game'
+            print 'O has won the game in %d steps' % numHand
         return True
     elif checkDiagonal():
         if count % 2 == 1:
-            print 'X has won the game'
+            print 'X has won the game in %d steps' % numHand
         else:
-            print 'O has won the game'
+            print 'O has won the game in %d steps' % numHand
         return True
     return False
 
@@ -85,7 +88,7 @@ def getInput():
 
     while True:
         input = raw_input("Which cell do you want to place your move? (level, x, y)")
-        level, x, y = input.split(' ')
+        level, x, y = input.strip().split(' ')
         level = int(level)
         x = int(x)
         y = int(y)
@@ -123,10 +126,12 @@ def heuristic(player):
                     opponentCount += 1
                     break
                 elif levelBoard[j][k] == '_':
-                    myPrev = 0
+                #myPrev = 0
+                    continue
                 else:
-                    myPrev += 1 if k == 0 or levelBoard[j][k - 1] == levelBoard[j][k] else 1
-                    myCount = max(myPrev, myCount)
+                    #myPrev += 1 if k == 0 or levelBoard[j][k - 1] == levelBoard[j][k] else 1
+                    #myCount = max(myPrev, myCount)
+                    myCount += 1
             eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
         #vertical
         for k in range(4):
@@ -138,10 +143,12 @@ def heuristic(player):
                     opponentCount += 1
                     break
                 elif levelBoard[j][k] == '_':
-                    myPrev = 0
+                #myPrev = 0
+                    continue
                 else:
-                    myPrev += 1 if j == 0 or levelBoard[j - 1][k] == levelBoard[j][k] else 1
-                    myCount = max(myPrev, myCount)
+                    #myPrev += 1 if j == 0 or levelBoard[j - 1][k] == levelBoard[j][k] else 1
+                    #myCount = max(myPrev, myCount)
+                    myCount += 1
             eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
             
         myPrev = 0
@@ -152,10 +159,12 @@ def heuristic(player):
                 opponentCount += 1
                 break
             elif levelBoard[j][j] == '_':
-                myPrev = 0
+            #myPrev = 0
+                continue
             else:
-                myPrev += 1 if j == 0 or levelBoard[j - 1][j - 1] == levelBoard[j][j] else 1
-                myCount = max(myPrev, myCount)
+                #myPrev += 1 if j == 0 or levelBoard[j - 1][j - 1] == levelBoard[j][j] else 1
+                #myCount = max(myPrev, myCount)
+                myCount += 1
         eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
         myPrev = 0
@@ -166,10 +175,12 @@ def heuristic(player):
                 opponentCount += 1
                 break
             elif levelBoard[j][3 - j] == '_':
-                myPrev = 0
+            #myPrev = 0
+                continue
             else:
-                myPrev += 1 if j == 0 or levelBoard[j - 1][3 - (j - 1)] == levelBoard[j][3 - j] else 1
-                myCount = max(myPrev, myCount)
+                #myPrev += 1 if j == 0 or levelBoard[j - 1][3 - (j - 1)] == levelBoard[j][3 - j] else 1
+                #myCount = max(myPrev, myCount)
+                myCount += 1
         eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
             
     #vertical
@@ -183,10 +194,12 @@ def heuristic(player):
                     opponentCount += 1
                     break
                 elif board[i][j][k] == '_':
-                    myPrev = 0
+                #myPrev = 0
+                    continue
                 else:
-                    myPrev += 1 if i == 0 or board[i - 1][j][k] == board[i][j][k] else 1
-                    myCount = max(myPrev, myCount)
+                    #myPrev += 1 if i == 0 or board[i - 1][j][k] == board[i][j][k] else 1
+                    #myCount = max(myPrev, myCount)
+                    myCount += 1
             eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
     for j in range(4):
@@ -198,10 +211,12 @@ def heuristic(player):
                 opponentCount += 1
                 break
             elif board[i][j][i] == '_':
-                myPrev = 0
+            #myPrev = 0
+                continue
             else:
-                myPrev += 1 if i == 0 or board[i - 1][j][i - 1] == board[i][j][i] else 1
-                myCount = max(myPrev, myCount)
+#                myPrev += 1 if i == 0 or board[i - 1][j][i - 1] == board[i][j][i] else 1
+#myCount = max(myPrev, myCount)
+                myCount += 1
         eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
         myCount = 0
@@ -212,10 +227,12 @@ def heuristic(player):
                 opponentCount += 1
                 break
             elif board[i][j][3 - i] == '_':
-                myPrev = 0
+            #myPrev = 0
+                continue
             else:
-                myPrev += 1 if i == 0 or board[i - 1][j][3 - (i - 1)] == board[i][j][3 - i] else 1
-                myCount = max(myPrev, myCount)
+                #myPrev += 1 if i == 0 or board[i - 1][j][3 - (i - 1)] == board[i][j][3 - i] else 1
+                #myCount = max(myPrev, myCount)
+                myCount += 1
         eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
         myCount = 0
         opponentCount = 0
@@ -225,10 +242,12 @@ def heuristic(player):
                 opponentCount += 1
                 break
             elif board[i][i][j] == '_':
-                myPrev = 0
+            #myPrev = 0
+                continue
             else:
-                myPrev += 1 if i == 0 or board[i - 1][i - 1][j] == board[i][i][j] else 1
-                myCount = max(myPrev, myCount)
+                #myPrev += 1 if i == 0 or board[i - 1][i - 1][j] == board[i][i][j] else 1
+                #myCount = max(myPrev, myCount)
+                myCount += 1
         eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
         myCount = 0
         opponentCount = 0
@@ -238,10 +257,12 @@ def heuristic(player):
                 opponentCount += 1
                 break
             elif board[i][3 - i][j] == '_':
-                myPrev = 0
+            #myPrev = 0
+                continue
             else:
-                myPrev += 1 if i == 0 or board[i - 1][3 - (i - 1)][j] == board[i][3 - i][j] else 1
-                myCount = max(myPrev, myCount)
+                #myPrev += 1 if i == 0 or board[i - 1][3 - (i - 1)][j] == board[i][3 - i][j] else 1
+                #myCount = max(myPrev, myCount)
+                myCount += 1
         eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
     #diagonal
@@ -253,10 +274,12 @@ def heuristic(player):
             opponentCount += 1
             break
         elif board[i][i][i] == '_':
-            myPrev = 0
+        #myPrev = 0
+            continue
         else:
-            myPrev += 1 if i == 0 or board[i - 1][i - 1][i - 1] == board[i][i][i] else 1
-            myCount = max(myPrev, myCount)
+            #myPrev += 1 if i == 0 or board[i - 1][i - 1][i - 1] == board[i][i][i] else 1
+            #myCount = max(myPrev, myCount)
+            myCount += 1
     eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
     myCount = 0
@@ -267,10 +290,12 @@ def heuristic(player):
             opponentCount += 1
             break
         elif board[i][i][3 - i] == '_':
-            myPrev = 0
+        #myPrev = 0
+            continue
         else:
-            myPrev += 1 if i == 0 or board[i - 1][i - 1][3 - (i - 1)] == board[i][i][3 - i] else 1
-            myCount = max(myPrev, myCount)
+            #myPrev += 1 if i == 0 or board[i - 1][i - 1][3 - (i - 1)] == board[i][i][3 - i] else 1
+            #myCount = max(myPrev, myCount)
+            myCount += 1
     eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
     myCount = 0
@@ -281,10 +306,12 @@ def heuristic(player):
             opponentCount += 1
             break
         elif board[i][3 - i][i] == '_':
-            myPrev = 0
+        #myPrev = 0
+            continue
         else:
-            myPrev += 1 if i == 0 or board[i - 1][3 - (i - 1)][i - 1] == board[i][3 - i][i] else 1
-            myCount = max(myPrev, myCount)
+            #myPrev += 1 if i == 0 or board[i - 1][3 - (i - 1)][i - 1] == board[i][3 - i][i] else 1
+            #myCount = max(myPrev, myCount)
+            myCount += 1
     eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
     myCount = 0
@@ -295,10 +322,12 @@ def heuristic(player):
             opponentCount += 1
             break
         elif board[3 - i][i][i] == '_':
-            myPrev = 0
+        #myPrev = 0
+            continue
         else:
-            myPrev += 1 if i == 0 or board[3 - (i - 1)][i - 1][i - 1] == board[3 - i][i][i] else 1
-            myCount = max(myPrev, myCount)
+            #myPrev += 1 if i == 0 or board[3 - (i - 1)][i - 1][i - 1] == board[3 - i][i][i] else 1
+            #myCount = max(myPrev, myCount)
+            myCount += 1
     eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
     return eval
@@ -306,6 +335,7 @@ def heuristic(player):
 def minmax():
     max_dict = {}
     min_dict = {}
+    loc = ""
     for i1 in range(4):
         for j1 in range(4):
             for k1 in range(4):
@@ -314,13 +344,14 @@ def minmax():
                 else:
                     board[i1][j1][k1] = 'X' if count % 2 == 0 else 'O'
                 loc = str(i1) + str(j1) + str(k1)
+                myVal = heuristic(count)
+                if myVal >= int(pow(76, 3)):
+                    return myVal, loc
                 currMax = -float("inf")
                 oppoMax = -float("inf")
                 for i2 in range(4):
                     for j2 in range(4):
                         for k2 in range(4):
-                            myVal = heuristic(count)
-
                             if board[i2][j2][k2] != '_':
                                 continue
                             else:
@@ -339,8 +370,8 @@ def minmax():
 
     minVal = float("inf")
 
-    print min_dict
-    print max_dict
+#print min_dict
+#print max_dict
     
     for loc in min_dict:
         if minVal <= min_dict[loc]:
@@ -358,7 +389,20 @@ def minmax():
             else:
                 maxVal = max_dict[loc]
                 maxLoc = loc
-    return maxVal, maxLoc
+    return maxVal, maxLoc or loc
+
+def randomPlayer():
+    global available
+    if len(available) == 0:
+        print "DRAW"
+        return
+
+    randomLoc = random.randint(0, len(available) - 1)
+    global board
+    global count
+    board[int(available[randomLoc][0])][int(available[randomLoc][1])][int(available[randomLoc][2])] = 'X' if count % 2 == 0 else 'O'
+    del available[randomLoc]
+    count += 1
 
 count = 0
 board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
@@ -377,14 +421,47 @@ board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
 #print(heuristic(1))
 #print(heuristic(2, 2, 2, 0, 0, 2, 0))
 
-while True:
-    displayBoard()
-    getInput()
-    if checkWin():
-        break
+available = []
+for i in range(4):
+    for j in range(4):
+        for k in range(4):
+            available.append(str(i) + str(j) + str(k))
 
-    currMax, loc = minmax()
-    board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
-    if checkWin():
-        break
-    count += 1
+numHand = 0
+numWin = 0
+numLose = 0
+numDraw = 0
+numStep = 0
+for num in range(10):
+    numHand = 0
+    available = []
+    for i in range(4):
+        for j in range(4):
+            for k in range(4):
+                available.append(str(i) + str(j) + str(k))
+    count = 0
+    board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
+
+    while True:
+        if len(available) == 0:
+            numDraw += 1
+            break
+        #displayBoard()
+        #getInput()
+        randomPlayer()
+        numHand += 1
+        if checkWin():
+            numLose += 1
+            break
+
+        currMax, loc = minmax()
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
+        del available[available.index(loc)]
+        count += 1
+        if checkWin():
+            numWin += 1
+            numStep += numHand
+            #displayBoard()
+            break
+
+print "Probabiliy of wining against random is %f with average winning steps of %f" % ((numWin / 100), (numStep / (float)(numWin)))
