@@ -345,6 +345,8 @@ def minmax():
                 min_dict[loc] = oppoMax
                 board[i1][j1][k1] = '_'
 
+    print prune
+    print min_dict
     minVal = float("inf")
     
     for loc in min_dict:
@@ -380,7 +382,7 @@ while True:
         break
 
     currMax, loc = minmax()
-    board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
+    board[int(loc[0])][int(loc[1])][int(loc[2])] = 'X' if count % 2 == 0 else 'O'
 
     count += 1
     if checkWin():

@@ -61,8 +61,14 @@ def checkVertical():
         if board[0][0][k] != '_' and board[0][0][k] == board[1][1][k] and \
             board[1][1][k] == board[2][2][k] and board[2][2][k] == board[3][3][k]:
             return True
+        if board[0][3][k] != '_' and board[0][3][k] == board[1][2][k] and \
+            board[1][2][k] != board[2][1][k] and board[2][1][k] == board[3][0][k]:
+            return True
         if board[0][k][0] != '_' and board[0][k][0] == board[1][k][1] and \
             board[1][k][1] == board[2][k][2] and board[2][k][2] == board[3][k][3]:
+            return True
+        if board[0][k][3] != '_' and board[0][k][3] == board[1][k][2] and \
+            board[1][k][2] == board[2][k][1] and board[2][k][1] == board[3][k][0]:
             return True
     return False
 
@@ -455,7 +461,7 @@ for num in range(1000):
             break
 
         currMax, loc = minmax()
-        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'X' if count % 2 == 0 else 'O'
         del available[available.index(loc)]
         count += 1
         if checkWin():
@@ -464,4 +470,46 @@ for num in range(1000):
             #displayBoard()
             break
 
-print "Probabiliy of wining against random is %f with average winning steps of %f" % ((numWin / 1000), (numStep / (float)(numWin)))
+print "Probabiliy of wining against random is %f with average winning steps of %f" % ((numWin / (float)(1000)), (numStep / (float)(numWin)))
+
+
+
+numHand = 0
+numWin = 0
+numLose = 0
+numDraw = 0
+numStep = 0
+for num in range(1000):
+    numHand = 0
+    available = []
+    for i in range(4):
+        for j in range(4):
+            for k in range(4):
+                available.append(str(i) + str(j) + str(k))
+    count = 0
+    board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
+    
+    while True:
+        if len(available) == 0:
+            numDraw += 1
+            break
+        
+        currMax, loc = minmax()
+        numHand += 1
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'X' if count % 2 == 0 else 'O'
+        del available[available.index(loc)]
+        count += 1
+        if checkWin():
+            numWin += 1
+            numStep += numHand
+            #displayBoard()
+            break
+
+        randomPlayer()
+        if checkWin():
+            numLose += 1
+            break
+
+
+print "Probabiliy of wining against random is %f with average winning steps of %f" % ((numWin / (float)(1000)), (numStep / (float)(numWin)))
+

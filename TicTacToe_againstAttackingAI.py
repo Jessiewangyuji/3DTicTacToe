@@ -1,5 +1,4 @@
 import random
-from sets import Set
 
 def displayBoard():
     global board
@@ -89,32 +88,11 @@ def checkDiagonal():
         return True
     return False
 
-def getInput():
-    global count
-    global board
-
-    while True:
-        input = raw_input("Which cell do you want to place your move? (level, x, y)")
-        level, x, y = input.strip().split(' ')
-        level = int(level)
-        x = int(x)
-        y = int(y)
-
-        if level < 0 or level >= 4 or x < 0 or x >= 4 or y < 0 or y >= 4:
-            print "Invalid cell location"
-        elif board[level][x][y] != '_':
-            print "Cell is not available to place your move. Please choose an empty cell"
-        else:
-            board[level][x][y] = 'X' if count % 2 == 0 else 'O'
-            break
-    count += 1
-#displayBoard()
-
 def heuristic(player):
     global board
     myMove = 'X' if player % 2 == 0 else 'O'
     opponentMove = 'O' if player % 2 == 0 else 'X'
-
+    
     eval = 0
     #horizontal
     myCount = 0
@@ -135,7 +113,6 @@ def heuristic(player):
                 else:
                     myCount += 1
             eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
-                
         #vertical
         for k in range(4):
             myPrev = 0
@@ -151,6 +128,7 @@ def heuristic(player):
                     myCount += 1
             eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
             
+        myPrev = 0
         myCount = 0
         opponentCount = 0
         for j in range(4):
@@ -163,6 +141,7 @@ def heuristic(player):
                 myCount += 1
         eval += 0 if opponentCount > 0 else int(pow(76, myCount - 1))
 
+        myPrev = 0
         myCount = 0
         opponentCount = 0
         for j in range(4):
@@ -300,10 +279,7 @@ def heuristic(player):
 def minmax():
     max_dict = {}
     min_dict = {}
-    prune = Set()
     loc = ""
-    beta = float("inf")
-    
     for i1 in range(4):
         for j1 in range(4):
             for k1 in range(4):
@@ -315,15 +291,11 @@ def minmax():
                 myVal = heuristic(count)
                 if myVal >= int(pow(76, 3)):
                     return myVal, loc
-            #currMax = -float("inf")
+                currMax = -float("inf")
                 oppoMax = -float("inf")
                 for i2 in range(4):
                     for j2 in range(4):
                         for k2 in range(4):
-                            loc2 = str(i2) + str(j2) + str(k2)
-                            #if loc2 in prune:
-                            #    continue
-                            
                             if board[i2][j2][k2] != '_':
                                 continue
                             else:
@@ -331,17 +303,11 @@ def minmax():
 
                             oppoVal = heuristic(count + 1)
 
-#currMax = max(currMax, myVal)
-#print(currMax)
+                            currMax = max(currMax, myVal)
                             oppoMax = max(oppoMax, oppoVal)
-                            if oppoVal <= beta:
-                                beta = oppoMax
-                            else: #Can prune opponent move
-                                prune.add(loc2)
-                            
                             board[i2][j2][k2] = '_'
                 
-                max_dict[loc] = myVal
+                max_dict[loc] = currMax
                 min_dict[loc] = oppoMax
                 board[i1][j1][k1] = '_'
 
@@ -364,25 +330,104 @@ def minmax():
                 maxLoc = loc
     return maxVal, maxLoc or loc
 
+def aggressivePlayer():
+    currMax = -float("inf")
+    currLoc = ""
+    for i1 in range(4):
+        for j1 in range(4):
+            for k1 in range(4):
+                if board[i1][j1][k1] != '_':
+                    continue
+                else:
+                    board[i1][j1][k1] = 'X' if count % 2 == 0 else 'O'
+                loc = str(i1) + str(j1) + str(k1)
+                myVal = heuristic(count)
+                if myVal == currMax:
+                    chance = random.uniform(0, 1)
+                    currLoc = loc if chance >= 0.5 else currLoc
+                elif myVal > currMax:
+                    currLoc = loc
+                
+                currMax = max(myVal, currMax)
+
+                board[i1][j1][k1] = '_'
+    return currLoc
+
 count = 0
 board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
 
+
 numHand = 0
-while True:
-    if numHand == 32:
-        print "DRAW!"
-        break
-    displayBoard()
-    getInput()
-    numHand += 1
-    if checkWin():
-        displayBoard()
-        break
+numWin = 0
+numLose = 0
+numDraw = 0
+numStep = 0
 
-    currMax, loc = minmax()
-    board[int(loc[0])][int(loc[1])][int(loc[2])] = 'O'
 
-    count += 1
-    if checkWin():
-        displayBoard()
-        break
+for num in range(1000):
+    numHand = 0
+    
+    count = 0
+    board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
+
+    while True:
+        if numHand == 32:
+            numDraw += 1
+            break
+
+        loc = aggressivePlayer()
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'X' if count % 2 == 0 else 'O'
+        count += 1
+        numHand += 1
+        if checkWin():
+            numLose += 1
+            break
+
+        currMax, loc = minmax()
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'X' if count % 2 == 0 else 'O'
+        count += 1
+        if checkWin():
+            numWin += 1
+            numStep += numHand
+            break
+
+print "Probabiliy of wining against aggressive is %f with average winning steps of %f" % ((numWin / (float)(1000)), (numStep / (float)(numWin)))
+
+
+
+numHand = 0
+numWin = 0
+numLose = 0
+numDraw = 0
+numStep = 0
+for num in range(1000):
+    numHand = 0
+
+    count = 0
+    board = [[['_' for k in range(4)] for j in range(4)] for i in range(4)]
+    
+    while True:
+        if numHand == 32:
+            numDraw += 1
+            break
+        
+        currMax, loc = minmax()
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'X' if count % 2 == 0 else 'O'
+        numHand += 1
+        count += 1
+        if checkWin():
+            numWin += 1
+            numStep += numHand
+            break
+        
+        loc = aggressivePlayer()
+        board[int(loc[0])][int(loc[1])][int(loc[2])] = 'X' if count % 2 == 0 else 'O'
+        count += 1
+        numHand += 1
+        if checkWin():
+            numLose += 1
+            break
+
+
+print "Probabiliy of wining against aggresiveAI is %f with average winning steps of %f" % ((numWin / (float)(1000)), (numStep / (float)(numWin)))
+
