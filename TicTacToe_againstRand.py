@@ -464,4 +464,4 @@ for num in range(1000):
             #displayBoard()
             break
 
-print "Probabiliy of wining against random is %f with average winning steps of %f" % ((numWin / 100), (numStep / (float)(numWin)))
+print "Probabiliy of wining against random is %f with average winning steps of %f" % ((numWin / 1000), (numStep / (float)(numWin)))
